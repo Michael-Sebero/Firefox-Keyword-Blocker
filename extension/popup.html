@@ -35,6 +35,7 @@
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 12px; /* Added more space above the button */
     }
     button:hover {
       background-color: #45a049;
@@ -50,21 +51,18 @@
       overflow-y: auto;
     }
     .hint {
-      font-size: 0.8em;
+      font-size: 0.85em;
       color: #777;
       margin-top: 5px;
+      margin-bottom: 12px; /* Added more space below the hint */
     }
     .toggle-container {
       display: flex;
       align-items: center;
       margin-bottom: 15px;
-      padding: 5px;
+      padding: 8px 10px;
       background-color: #f9f9f9;
       border-radius: 4px;
-    }
-    .toggle-container label {
-      margin-left: 10px;
-      font-weight: bold;
     }
     .toggle-switch {
       position: relative;
@@ -107,8 +105,15 @@
     }
     .status-indicator {
       margin-left: auto;
-      font-size: 0.8em;
+      font-size: 0.85em;
       color: #777;
+    }
+    /* Fix for the toggle click area */
+    .toggle-label {
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+      user-select: none; /* Prevent text selection */
     }
   </style>
 </head>
@@ -116,11 +121,11 @@
   <h2>Keyword Blocker</h2>
   
   <div class="toggle-container">
-    <div class="toggle-switch">
+    <label class="toggle-switch" for="enableBlocker">
       <input type="checkbox" id="enableBlocker" checked>
       <span class="slider"></span>
-    </div>
-    <label for="enableBlocker">Enable Blocker</label>
+    </label>
+    <span class="toggle-label" onclick="document.getElementById('enableBlocker').click()">Enable Blocker</span>
     <span class="status-indicator" id="toggle-status">Enabled</span>
   </div>
   

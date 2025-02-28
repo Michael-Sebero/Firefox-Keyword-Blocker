@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     enableToggle.checked = enabled;
     toggleStatus.textContent = enabled ? "Enabled" : "Disabled";
     
-    updateStatus(`Loaded ${keywords.length} keywords. Blocker is ${enabled ? "enabled" : "disabled"}.`);
+    updateStatus(`Blocking ${keywords.length} keywords.`);
   });
 
   // Toggle blocker enabled/disabled
