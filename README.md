@@ -8,15 +8,14 @@
 	
 
 ## Before 
-https://raw.githubusercontent.com/Michael-Sebero/Firefox-Keyword-Blocker/refs/heads/main/before%20%26%20after/before.png
+![Before](https://raw.githubusercontent.com/Michael-Sebero/Firefox-Keyword-Blocker/refs/heads/main/before%20%26%20after/before.png)
 	
 > Hiding keywords JLC3DP and SQTDDTOT.
 
 ## After
-https://raw.githubusercontent.com/Michael-Sebero/Firefox-Keyword-Blocker/refs/heads/main/before%20%26%20after/after.png
+![After](https://raw.githubusercontent.com/Michael-Sebero/Firefox-Keyword-Blocker/refs/heads/main/before%20%26%20after/after.png)
 	
 > Keywords hidden.
-
 
 ## Donations and Contacts
 PayPal: https://www.paypal.com/donate/?cmd=_donations&business=YYGU9JWJEE2AG
