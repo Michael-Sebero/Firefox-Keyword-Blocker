@@ -18,14 +18,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Save keywords when Apply is clicked
   applyButton.addEventListener('click', () => {
-    const keywords = textarea.value.split(',').map(k => k.trim()).filter(k => k);
+    // Split by commas, trim whitespace, and filter out empty entries
+    const keywordsInput = textarea.value;
+    const keywords = keywordsInput
+      .split(',')
+      .map(k => k.trim())
+      .filter(k => k.length > 0);
+    
+    // Validate keywords (optional word validation could be added here)
+    if (keywords.length === 0 && keywordsInput.length > 0) {
+      updateStatus("Warning: No valid keywords found. Make sure they're comma-separated.");
+      return;
+    }
+    
     updateStatus("Saving keywords...");
     browser.storage.local.set({ keywords: keywords }, () => {
       if (browser.runtime.lastError) {
         updateStatus(`Error saving keywords: ${browser.runtime.lastError.message}`);
       } else {
-        browser.runtime.sendMessage({ action: "keywordsUpdated", keywords: keywords });
-        updateStatus(`Saved ${keywords.length} keywords: ${keywords.join(', ')}`);
+        browser.runtime.sendMessage({ action: "keywordsUpdated", keywords: keywords })
+          .then(() => {
+            updateStatus(`Saved ${keywords.length} keywords: ${keywords.join(', ')}`);
+          })
+          .catch(error => {
+            updateStatus(`Keywords saved but error notifying tabs: ${error}`);
+          });
       }
     });
   });
