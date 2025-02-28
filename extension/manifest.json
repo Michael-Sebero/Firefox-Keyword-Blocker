@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Keyword Blocker",
-  "version": "1.2",
+  "version": "1.3",
   "description": "Hides elements containing specified keywords",
   "icons": {
     "16": "icons/icon-16.png",

@@ -1,6 +1,12 @@
 let keywords = [];
+let blockerEnabled = true; // Default to enabled
 
 function hideElements() {
+  if (!blockerEnabled) {
+    console.log("Blocker is disabled. Not hiding elements.");
+    return;
+  }
+  
   console.log("Hiding elements. Current keywords:", keywords);
   const elements = document.body.getElementsByTagName('*');
   let hiddenCount = 0;
@@ -13,6 +19,18 @@ function hideElements() {
   }
 
   console.log(`Hidden ${hiddenCount} elements`);
+}
+
+function showAllElements() {
+  // Find all hidden elements by this extension and unhide them
+  // We'll use a specific attribute to mark hidden elements
+  const hiddenElements = document.querySelectorAll('[data-keyword-blocker-hidden="true"]');
+  console.log(`Unhiding ${hiddenElements.length} elements`);
+  
+  hiddenElements.forEach(element => {
+    element.style.display = '';
+    element.removeAttribute('data-keyword-blocker-hidden');
+  });
 }
 
 function shouldHideElement(element) {
@@ -77,49 +95,110 @@ function hideElementAndItsContent(element) {
   if (container && container !== document.body && 
       !container.tagName.match(/^(HTML|BODY|HEAD|HEADER|NAV|FOOTER)$/i)) {
     container.style.display = 'none';
+    container.setAttribute('data-keyword-blocker-hidden', 'true');
   } else {
     element.style.display = 'none';
+    element.setAttribute('data-keyword-blocker-hidden', 'true');
   }
   
   // Find and hide associated media
   const media = findAssociatedMedia(container || element);
   if (media) {
     media.style.display = 'none';
+    media.setAttribute('data-keyword-blocker-hidden', 'true');
   }
 
   // Try to find and hide associated description
   let nextSibling = container ? container.nextElementSibling : element.nextElementSibling;
   if (nextSibling && nextSibling.tagName.toLowerCase() === 'p') {
     nextSibling.style.display = 'none';
+    nextSibling.setAttribute('data-keyword-blocker-hidden', 'true');
+  }
+}
+
+function toggleBlocker(enabled) {
+  console.log(`Toggling blocker: ${enabled ? "enabled" : "disabled"}`);
+  blockerEnabled = enabled;
+  
+  if (enabled) {
+    // Re-apply hiding
+    hideElements();
+  } else {
+    // Show all hidden elements
+    showAllElements();
   }
 }
 
 function updateKeywords(newKeywords) {
   console.log("Updating keywords:", newKeywords);
   keywords = newKeywords;
-  hideElements();
+  
+  // If the blocker is enabled, re-apply hiding
+  if (blockerEnabled) {
+    // First unhide everything
+    showAllElements();
+    // Then apply with new keywords
+    hideElements();
+  }
 }
 
-// Load initial keywords
-browser.storage.local.get("keywords", (data) => {
-  console.log("Initial keywords load:", data.keywords);
-  updateKeywords(data.keywords || []);
+// Initialize settings
+function initialize(settings) {
+  console.log("Initializing with settings:", settings);
+  keywords = settings.keywords || [];
+  blockerEnabled = settings.enabled !== undefined ? settings.enabled : true;
+  
+  if (blockerEnabled) {
+    hideElements();
+  }
+}
+
+// Load initial settings
+browser.storage.local.get(["keywords", "enabled"], (data) => {
+  console.log("Initial settings load:", data);
+  initialize({
+    keywords: data.keywords || [],
+    enabled: data.enabled !== undefined ? data.enabled : true
+  });
 });
 
-// Listen for keyword updates
+// Listen for messages
 browser.runtime.onMessage.addListener((message) => {
   console.log("Received message:", message);
+  
   if (message.action === "updateKeywords") {
     updateKeywords(message.keywords);
+  }
+  
+  if (message.action === "toggleBlocker") {
+    toggleBlocker(message.enabled);
+  }
+  
+  if (message.action === "initialize") {
+    initialize({
+      keywords: message.keywords,
+      enabled: message.enabled
+    });
   }
 });
 
 // Run hideElements when the page loads and whenever it's updated
-window.addEventListener('load', hideElements);
-document.addEventListener('DOMContentLoaded', hideElements);
+window.addEventListener('load', () => {
+  if (blockerEnabled) {
+    hideElements();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (blockerEnabled) {
+    hideElements();
+  }
+});
 
 // Use a MutationObserver to watch for DOM changes
 const observer = new MutationObserver((mutations) => {
+  if (!blockerEnabled) return;
+  
   // Only process nodes that were added
   let elementsToCheck = [];
   
